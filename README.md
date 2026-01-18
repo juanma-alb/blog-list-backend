@@ -46,7 +46,7 @@ npm test
 ```
 
 
-## 🛠 Tech Stack
+## Tech Stack
 
 * Node.js & Express
 * MongoDB (Mongoose)

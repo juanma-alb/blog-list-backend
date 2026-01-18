@@ -1,21 +1,25 @@
 import js from "@eslint/js";
 import globals from "globals";
-import { defineConfig } from "eslint/config";
 import stylistic from '@stylistic/eslint-plugin';
 
-export default defineConfig([
-  { 
-    files: ["**/*.js"], 
-    languageOptions: { 
-      globals: globals.node,
-      sourceType: "commonjs" 
-    },
-    plugins: { 
-      js, 
-      '@stylistic': stylistic 
-    },
-    extends: [js.configs.recommended],
+export default [
+  js.configs.recommended,
+
+  {
+    files: ["**/*.js"],
     
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: {
+        ...globals.node,
+        ...globals.jest,
+      },
+    },
+
+    plugins: {
+      '@stylistic': stylistic,
+    },
+
     rules: {
       '@stylistic/indent': ['error', 2],
       '@stylistic/linebreak-style': ['error', 'windows'],
@@ -26,11 +30,12 @@ export default defineConfig([
       '@stylistic/arrow-spacing': ['error', { 'before': true, 'after': true }],
 
       'eqeqeq': ['error', 'always'],
-      'no-console': 0, 
+      'no-console': 0,
       'no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }]
     }
   },
+
   {
     ignores: ["dist/**", "build/**", "node_modules/**", "eslint.config.mjs"]
   }
-]);
+];
