@@ -100,7 +100,7 @@ describe('supertest tests', () => {
 })
 
 
-test.only('url and title properties are required, if not return 400 bad request', async () => {
+test('url and title properties are required, if not return 400 bad request', async () => {
 
   const blog = {
     author: 'String',
@@ -112,6 +112,63 @@ test.only('url and title properties are required, if not return 400 bad request'
     .expect(400)
 
 })
+
+describe('delete and put tests (ex.4.13-4.14)',  () => {
+
+  test('deleted blog returns 204 and the blogs list is reduced by 1',async () => {
+
+    const blogs= await api
+      .get('/api/blogs')
+
+    const blogId = blogs.body[0].id
+
+    await api
+      .delete(`/api/blogs/${blogId}`)
+      .expect(204)
+
+    const currentBlogs = (await api.get('/api/blogs')).body.length
+
+    expect(currentBlogs).toBe(initialBlogs.length-1)
+
+  })
+
+  test('creating a blog then update it and receive 200, and the updated content', async () => {
+
+    const blog = {
+      title: '123',
+      author: 'String',
+      url: 'String',
+      likes: 3
+    }
+
+    const updatedBlog={
+      title: '123',
+      author: 'String',
+      url: 'String',
+      likes: 4
+    }
+
+    await api
+      .post('/api/blogs')
+      .send (blog)
+      .expect(201)
+
+    const blogsGet = await api.get('/api/blogs')
+    const blogId = blogsGet.body[initialBlogs.length].id
+
+    await api.put(`/api/blogs/${blogId}`)
+      .send(updatedBlog)
+      .expect(200)
+
+
+    const newblogsGet = await api.get('/api/blogs')
+    const updatedBlogLikes = newblogsGet.body[initialBlogs.length].likes
+
+    expect(updatedBlogLikes).toBe(blog.likes+1)
+  })
+
+})
+
 
 afterAll(async () => {
   await mongoose.connection.close()
