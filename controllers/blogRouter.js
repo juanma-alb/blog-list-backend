@@ -3,7 +3,7 @@ const Blog = require('../models/blog')
 
 blogsRouter.get('/', async (_req, res, next) => {
   try {
-    const result = await Blog.find({})
+    const result = await Blog.find({}).populate('user', { username: 1, name: 1 })
 
     return res.status(200).json(result)
   }
@@ -11,19 +11,44 @@ blogsRouter.get('/', async (_req, res, next) => {
     next (error)}
 })
 
+blogsRouter.get ('/:id', async (req, res, next) => {
+  const { id } = req.params
+
+  try {
+    const blog = await Blog
+      .findById(id)
+      .populate ('user', { name: 1, username: 1 })
+
+    res
+      .status(200)
+      .json(blog)
+
+  } catch (error){
+    next (error)
+  }
+})
+
 blogsRouter.post('/', async (req, res, next) => {
+
   const { title, author, url, likes } = req.body
-  const blog = new Blog({
-    title,
-    author,
-    url,
-    likes
-  })
   try
   {
+    const user = req.user
+    if (!user)
+      return res.status(401).json({ error: 'user not found' })
+
+    const blog = new Blog({
+      title,
+      author,
+      url,
+      likes,
+      user: user._id
+    })
+
     const newBlog = await blog.save()
 
-    if (!newBlog) return res.status(404).json({ error: 'error saving blog' })
+    user.blogs = user.blogs.concat (newBlog)
+    await user.save()
 
     return res.status(201).json(newBlog)
 
@@ -36,10 +61,21 @@ blogsRouter.post('/', async (req, res, next) => {
 blogsRouter.delete('/:id', async (req, res, next) => {
 
   try{
-    const deletedBlog= await Blog.findByIdAndDelete(req.params.id)
+    const user = req.user
 
-    if (!deletedBlog)
+    if (!user) {
+      return res.status(401).json({ error: 'token missing or invalid' })
+    }
+
+    const blog= await Blog.findById(req.params.id)
+
+    if (!blog)
       return res.status(404).json({ error: 'blog not found' })
+
+    if (blog.user.toString() !== user.id)
+      return res.status(401).json({ error: 'unauthorized' })
+
+    await Blog.findByIdAndDelete(req.params.id)
 
     return res.status(204).json().end()
   }
@@ -70,7 +106,6 @@ blogsRouter.put('/:id', async (req, res, next) => {
     next(error)
   }
 })
-
 
 
 module.exports = blogsRouter
