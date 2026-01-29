@@ -1,0 +1,48 @@
+@baseUrl = http://localhost:3003/api
+@username = juan123
+@password = asd123
+
+### create user
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+    "username": "{{username}}",
+    "name": "Juan",
+    "password": "{{password}}"
+}
+
+
+### login
+# @name login
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+    "username": "{{username}}",
+    "password": "{{password}}"
+}
+
+
+### create blog
+# @name createBlog
+@token = {{login.response.body.token}}
+
+POST {{baseUrl}}/blogs
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "title": "Blog de {{username}}",
+    "author": "Juan",
+    "url": "fullstackopen.com",
+    "likes": 0
+}
+
+
+### delete created blog
+@blogId = {{createBlog.response.body.id}}
+@token = {{login.response.body.token}}
+
+DELETE {{baseUrl}}/blogs/{{blogId}}
+Authorization: Bearer {{token}}

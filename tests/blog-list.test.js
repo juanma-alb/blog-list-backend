@@ -30,7 +30,7 @@ beforeEach(async () => {
   await blogObject.save()
 })
 
-describe('supertest tests', () => {
+describe('get and post tests with supertest (ex. 4.8.-4.12)', () => {
 
   test('return 200 and blog-list', async () => {
     const response = await api

@@ -1,0 +1,19 @@
+@baseUrl = http://localhost:3003/api
+
+### GET
+GET {{baseUrl}}/users
+
+###
+### POST
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+    "username": "asd123",
+    "name": "asdasd",
+    "password": "asd123"
+}
+
+###
+### DELETE
+DELETE {{baseUrl}}/users/
