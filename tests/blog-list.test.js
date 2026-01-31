@@ -1,5 +1,6 @@
 //imports
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
@@ -20,15 +21,38 @@ const initialBlogs = [
   },
 ]
 
+let token= null
+
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
 
   let blogObject = new Blog(initialBlogs[0])
   await blogObject.save()
 
   blogObject = new Blog(initialBlogs[1])
   await blogObject.save()
+
+
+  const user = {
+    username: 'juan123',
+    name: 'juan',
+    password: 'asd123'
+  }
+
+  await api
+    .post ('/api/users')
+    .send(user)
+
+  const login = await api
+    .post ('/api/login')
+    .send (user)
+
+  token= login._body.token
+
 })
+
+
 
 describe('get and post tests with supertest (ex. 4.8.-4.12)', () => {
 
@@ -67,6 +91,7 @@ describe('get and post tests with supertest (ex. 4.8.-4.12)', () => {
 
     await api
       .post('/api/blogs')
+      .set ('Authorization', `Bearer ${token}`)
       .send(blog)
       .expect(201)
 
@@ -84,10 +109,11 @@ describe('get and post tests with supertest (ex. 4.8.-4.12)', () => {
     const blog = {
       title: 'String',
       author: 'String',
-      url: 'String'
+      url: 'String',
     }
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(blog)
 
     const response = await api.get ('/api/blogs')
@@ -97,38 +123,55 @@ describe('get and post tests with supertest (ex. 4.8.-4.12)', () => {
     expect(lastBlog.likes).toBe(0)
   })
 
+
+  test('url and title properties are required, if not return 400 bad request', async () => {
+
+
+    const blog = {
+      author: 'String',
+      likes: 0
+    }
+    await api
+      .post('/api/blogs')
+      .set ('Authorization', `Bearer ${token}`)
+      .send (blog)
+      .expect(400)
+
+  })
+
 })
 
-
-test('url and title properties are required, if not return 400 bad request', async () => {
-
-  const blog = {
-    author: 'String',
-    likes: 0
-  }
-  await api
-    .post('/api/blogs')
-    .send (blog)
-    .expect(400)
-
-})
 
 describe('delete and put tests (ex.4.13-4.14)',  () => {
 
   test('deleted blog returns 204 and the blogs list is reduced by 1',async () => {
 
+    const blog = {
+      title: 'String',
+      author: 'String',
+      url: 'String',
+    }
+    await api
+      .post ('/api/blogs')
+      .send (blog)
+      .set ('Authorization', `Bearer ${token}`)
+
     const blogs= await api
       .get('/api/blogs')
 
-    const blogId = blogs.body[0].id
+    expect(blogs.body.length).toBe(initialBlogs.length+1)
+
+    const blogId = blogs.body[blogs.body.length-1].id
 
     await api
       .delete(`/api/blogs/${blogId}`)
+      .set ('Authorization', `Bearer ${token}`)
       .expect(204)
+
 
     const currentBlogs = (await api.get('/api/blogs')).body.length
 
-    expect(currentBlogs).toBe(initialBlogs.length-1)
+    expect(currentBlogs).toBe(initialBlogs.length)
 
   })
 
@@ -150,6 +193,7 @@ describe('delete and put tests (ex.4.13-4.14)',  () => {
 
     await api
       .post('/api/blogs')
+      .set ('Authorization', `Bearer ${token}`)
       .send (blog)
       .expect(201)
 

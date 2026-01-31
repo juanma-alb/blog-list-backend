@@ -17,7 +17,6 @@ beforeEach(async () => {
   let userObject2 = new User({ name: 'asd321', username: 'fdsa', passwordHash })
 
   await Promise.all([userObject.save(), userObject2.save()])
-
 })
 
 
