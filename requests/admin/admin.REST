@@ -1,0 +1,50 @@
+@baseUrl = http://localhost:3003/api
+@username = admin1
+@password = secret
+
+###get all users
+GET {{baseUrl}}/users
+
+
+###get all blogs
+GET {{baseUrl}}/blogs
+
+###singin as admin
+# @name login
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+    "username": "{{username}}",
+    "password": "{{password}}"
+}
+
+
+###delete a user
+@token = {{login.response.body.token}}
+DELETE {{baseUrl}}/users/698025ac3ba4db7f6aa05317
+Authorization: Bearer {{token}}
+
+
+
+### delete all user
+DELETE {{baseUrl}}/admin/deleteAllUsers
+Authorization: Bearer {{token}}
+
+
+###delete a blog
+DELETE {{baseUrl}}/blogs/69802ae1cc0fdb07e45f5035
+Authorization: Bearer {{token}}
+
+### delete all blogs
+DELETE {{baseUrl}}/admin/deleteAllBlogs
+Authorization: Bearer {{token}}
+
+
+### give admin privileges
+PUT {{baseUrl}}/admin/697ada86517809f0d99f43f4/role
+Authorization: Bearer {{token}}
+
+{
+    "role": "admin"
+}

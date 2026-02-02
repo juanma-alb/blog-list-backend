@@ -1,0 +1,74 @@
+@baseUrl = http://localhost:3003/api
+@username = juan123
+@password = asd123
+
+
+### create user
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+    "username": "{{username}}",
+    "name": "Juan",
+    "password": "{{password}}",
+    "top": true
+}
+
+
+### login
+# @name login
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+    "username": "{{username}}",
+    "password": "{{password}}"
+}
+###-----------------------------------------------------------
+@token = {{login.response.body.token}}
+### create blog
+# @name createdBlog
+POST {{baseUrl}}/blogs
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "title": "Blog de {{username}}",
+    "author": "Juan",
+    "url": "fullstackopen.com",
+    "likes": 0
+}
+
+###see the blog created
+@blogId = {{createdBlog.response.body.id}}
+GET {{baseUrl}}/blogs/{{blogId}}
+
+### delete created blog
+DELETE {{baseUrl}}/blogs/{{blogId}}
+Authorization: Bearer {{token}}
+
+###-----------------------------------------------------------
+
+
+### coment a blog
+# @name createdComment
+POST {{baseUrl}}/blogs/{{blogId}}/comments
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "content": "nice post!",
+    "user": "697e667fbbf66fafe9927262"
+}
+
+
+###delete created comment
+@commentId = {{createdComment.response.body.comments[0]._id}}
+
+DELETE {{baseUrl}}/blogs/{{blogId}}/comments/{{commentId}}
+Authorization: Bearer {{token}}
+
+###-----------------------------------------------------------
+
+
+
