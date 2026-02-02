@@ -32,8 +32,21 @@ app.use(middleware.tokenExtractor)
 app.use('/api/blogs', middleware.userExtractor, blogsRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
+if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
+  const adminRouter = require('./controllers/adminRouter')
+  app.use('/api/admin', adminRouter)
+}
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
 
 module.exports = app
+
+//checklist
+/*
+-terminar rol admin
+-implementar script de inicializacion de admin
+-agregar seguridad en los puts de users
+-terminar endpoints de comments
+-terminar de testear comments y roles
+*/
