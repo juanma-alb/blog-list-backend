@@ -15,6 +15,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'password is required'] },
 
+  role: { type: String, default: 'user' },
+
   blogs: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Blog'
@@ -23,9 +25,15 @@ const userSchema = new mongoose.Schema({
 
 userSchema.set('toJSON', {
   transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
+    // 🛡️ CAMBIO IMPORTANTE: Agregamos este IF de seguridad
+    // Solo intentamos convertir el ID si realmente existe
+    if (returnedObject._id) {
+      returnedObject.id = returnedObject._id.toString()
+    }
+
     delete returnedObject._id
     delete returnedObject.__v
+    // La contraseña hash no debe mostrarse
     delete returnedObject.passwordHash
   }
 })
