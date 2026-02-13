@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:3003/api
-@username = juan123
+@username = juanceto01
 @password = asd123
 
 ### create user
@@ -33,8 +33,8 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "title": "Blog de {{username}}",
-    "author": "Juan",
+    "title": "My first blog",
+    "author": "{{username}}",
     "url": "fullstackopen.com",
     "likes": 0
 }
@@ -44,5 +44,14 @@ Authorization: Bearer {{token}}
 @blogId = {{createBlog.response.body.id}}
 @token = {{login.response.body.token}}
 
+
+### add like
+
+PUT {{baseUrl}}/blogs/698e603d9e9c1ba579d323fa/like
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+###
 DELETE {{baseUrl}}/blogs/{{blogId}}
 Authorization: Bearer {{token}}

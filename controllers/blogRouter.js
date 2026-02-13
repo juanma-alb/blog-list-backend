@@ -86,7 +86,7 @@ blogsRouter.delete('/:id', async (req, res, next) => {
 
 })
 
-blogsRouter.put('/:id', async (req, res, next) => {
+blogsRouter.put('/:id/updateBlog', async (req, res, next) => {
 
   const { title, author,url, likes } = req.body
   const blog ={
@@ -107,5 +107,40 @@ blogsRouter.put('/:id', async (req, res, next) => {
   }
 })
 
+blogsRouter.put ('/:id', async (req, res, next) => {
+  const user = req.user
+
+  if (!user)
+    return res.status(401).json({ error: 'you must be logged to do this' })
+
+  const { id } = req.params
+  const blog = await Blog.findById(id)
+
+  if(!blog)
+    return res.status(404).json({ error: 'blog not found' })
+
+  const blogObj ={
+    likes: blog.likes +1
+  }
+  try {
+    const response= await Blog
+      .findByIdAndUpdate(req.params.id, blogObj,
+        { new: true, runValidators:true })
+      .populate('user', { username: 1, name: 1 })
+
+
+    return res.status(200).json(response)
+  }
+
+  catch (error) {
+    next (error)
+  }
+})
+
+
+blogsRouter.post('/deleteAll', async (req, res) => {
+  await Blog.deleteMany({})
+  return res.status(204).end()
+})
 
 module.exports = blogsRouter

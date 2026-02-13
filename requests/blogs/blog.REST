@@ -33,3 +33,5 @@ Content-Type: application/json
 ### DELETE
 DELETE {{baseUrl}}/blogs/6973fada55e7f3a4f4ad04c6
 //Authorization: Bearer {{token}}
+###
+POST {{baseUrl}}/blogs/deleteAll
